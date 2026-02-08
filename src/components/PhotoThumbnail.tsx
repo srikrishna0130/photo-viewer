@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import type { ImageFile } from '../types';
-import { loadThumbnail, revokeImageUrl } from '../utils/imageLoader';
+import { loadThumbnailFast, revokeImageUrl } from '../utils/imageLoader';
 
 interface PhotoThumbnailProps {
   image: ImageFile;
@@ -34,7 +34,7 @@ const PhotoThumbnail = memo(function PhotoThumbnail({
           hasLoadedRef.current = true;
           observer.disconnect();
 
-          loadThumbnail(image.handle)
+          loadThumbnailFast(image.handle)
             .then((thumbUrl) => {
               setUrl(thumbUrl);
               setIsLoading(false);
@@ -46,7 +46,7 @@ const PhotoThumbnail = memo(function PhotoThumbnail({
             });
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '600px' }
     );
 
     if (containerRef.current) observer.observe(containerRef.current);

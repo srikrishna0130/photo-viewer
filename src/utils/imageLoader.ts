@@ -1,4 +1,5 @@
 import type { ImageFile } from '../types';
+import { thumbnailQueue } from './loadQueue';
 
 /**
  * Resolves a handle (FileSystemFileHandle or raw File) to a File object
@@ -25,8 +26,26 @@ export async function loadImageFromHandle(
 }
 
 /**
+ * Fast thumbnail loader — creates a direct blob URL from the file.
+ * Skips the expensive createImageBitmap → canvas → JPEG re-encode pipeline.
+ * Lets the browser's <img> element handle native decode + resize via CSS.
+ * Goes through a concurrency queue to prevent I/O thrashing.
+ * @param handle - FileSystemFileHandle or File to load
+ * @returns Object URL for displaying as a thumbnail
+ */
+export async function loadThumbnailFast(
+  handle: FileSystemFileHandle | File
+): Promise<string> {
+  return thumbnailQueue.enqueue(async () => {
+    const file = await resolveFile(handle);
+    return URL.createObjectURL(file);
+  });
+}
+
+/**
  * Loads a thumbnail-sized version of an image for grid display
- * Uses createImageBitmap for efficient resizing
+ * Uses createImageBitmap for explicit resizing (slower but smaller memory)
+ * Prefer loadThumbnailFast for most use cases.
  * @param handle - FileSystemFileHandle or File to load
  * @param maxSize - Maximum width/height of thumbnail (default: 300)
  * @returns Object URL for the thumbnail

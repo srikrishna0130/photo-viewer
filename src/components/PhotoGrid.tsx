@@ -32,7 +32,7 @@ export default function PhotoGrid({
     count: rowCount,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 200,
-    overscan: 3,
+    overscan: 5,
   });
 
   const handleThumbnailLoad = useCallback(

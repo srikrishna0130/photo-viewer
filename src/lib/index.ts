@@ -34,10 +34,12 @@ export {
 export {
   loadImageFromHandle,
   loadThumbnail,
+  loadThumbnailFast,
   revokeImageUrl,
   getImageDimensions,
   sortImages,
 } from '../utils/imageLoader';
+export { createLoadQueue, thumbnailQueue } from '../utils/loadQueue';
 export {
   getFileExtension,
   isImageFile,
