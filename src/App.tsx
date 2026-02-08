@@ -13,7 +13,7 @@ import { collectAllImages } from './utils/treeBuilder';
 import type { FolderNode, ImageFile } from './types';
 
 function App(): React.ReactElement {
-  const { folderTree, scanState, openDirectory, isSupported } = useFileSystem();
+  const { folderTree, scanState, openDirectory } = useFileSystem();
   const [selectedFolder, setSelectedFolder] = useState<FolderNode | null>(null);
   const [viewerState, setViewerState] = useState<{
     images: ImageFile[];
@@ -63,13 +63,6 @@ function App(): React.ReactElement {
             to get started.
           </p>
 
-          {!isSupported && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-sm text-yellow-800">
-              ⚠️ Your browser doesn&apos;t support the File System Access API.
-              Please use Chrome or Edge.
-            </div>
-          )}
-
           {scanState.error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-sm text-red-700">
               {scanState.error}
@@ -78,7 +71,7 @@ function App(): React.ReactElement {
 
           <button
             onClick={openDirectory}
-            disabled={!isSupported || scanState.isScanning}
+            disabled={scanState.isScanning}
             className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-lg font-medium shadow-md"
           >
             {scanState.isScanning ? (

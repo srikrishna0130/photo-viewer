@@ -3,7 +3,8 @@
  */
 
 /**
- * Represents a single image file with metadata
+ * Represents a single image file with metadata.
+ * Uses either FileSystemFileHandle (Chrome/Edge) or raw File (Firefox fallback).
  */
 export interface ImageFile {
   /** Unique identifier for the image */
@@ -16,8 +17,8 @@ export interface ImageFile {
   size: number;
   /** Last modified timestamp */
   lastModified: number;
-  /** File handle from File System Access API */
-  handle: FileSystemFileHandle;
+  /** File handle (Chrome) or raw File object (Firefox fallback) */
+  handle: FileSystemFileHandle | File;
   /** Parent folder path */
   folderPath: string;
 }

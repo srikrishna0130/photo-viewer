@@ -1,29 +1,41 @@
 import type { ImageFile } from '../types';
 
 /**
+ * Resolves a handle (FileSystemFileHandle or raw File) to a File object
+ * @param handle - FileSystemFileHandle or File
+ * @returns The File object
+ */
+async function resolveFile(
+  handle: FileSystemFileHandle | File
+): Promise<File> {
+  if (handle instanceof File) return handle;
+  return await handle.getFile();
+}
+
+/**
  * Creates an object URL for an image file handle
- * @param handle - FileSystemFileHandle to load
+ * @param handle - FileSystemFileHandle or File to load
  * @returns Object URL string for displaying the image
  */
 export async function loadImageFromHandle(
-  handle: FileSystemFileHandle
+  handle: FileSystemFileHandle | File
 ): Promise<string> {
-  const file = await handle.getFile();
+  const file = await resolveFile(handle);
   return URL.createObjectURL(file);
 }
 
 /**
  * Loads a thumbnail-sized version of an image for grid display
  * Uses createImageBitmap for efficient resizing
- * @param handle - FileSystemFileHandle to load
+ * @param handle - FileSystemFileHandle or File to load
  * @param maxSize - Maximum width/height of thumbnail (default: 300)
  * @returns Object URL for the thumbnail
  */
 export async function loadThumbnail(
-  handle: FileSystemFileHandle,
+  handle: FileSystemFileHandle | File,
   maxSize: number = 300
 ): Promise<string> {
-  const file = await handle.getFile();
+  const file = await resolveFile(handle);
   const bitmap = await createImageBitmap(file, {
     resizeWidth: maxSize,
     resizeHeight: maxSize,
@@ -54,13 +66,13 @@ export function revokeImageUrl(url: string): void {
 
 /**
  * Gets image dimensions from a file handle
- * @param handle - FileSystemFileHandle to read dimensions from
+ * @param handle - FileSystemFileHandle or File to read dimensions from
  * @returns Width and height of the image
  */
 export async function getImageDimensions(
-  handle: FileSystemFileHandle
+  handle: FileSystemFileHandle | File
 ): Promise<{ width: number; height: number }> {
-  const file = await handle.getFile();
+  const file = await resolveFile(handle);
   const bitmap = await createImageBitmap(file);
   const { width, height } = bitmap;
   bitmap.close();

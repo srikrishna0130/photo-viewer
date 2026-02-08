@@ -4,6 +4,7 @@ import {
   isFileSystemAccessSupported,
   selectDirectory,
   scanDirectoryRecursively,
+  selectDirectoryFallback,
 } from '../services/fileService';
 import { buildFolderTree } from '../utils/treeBuilder';
 
@@ -16,8 +17,9 @@ interface UseFileSystemReturn {
 }
 
 /**
- * Hook to manage directory selection and file scanning
- * Provides folder tree data and scan state
+ * Hook to manage directory selection and file scanning.
+ * Uses File System Access API in Chrome/Edge, falls back to
+ * <input webkitdirectory> for Firefox and other browsers.
  */
 export function useFileSystem(): UseFileSystemReturn {
   const [folderTree, setFolderTree] = useState<FolderNode | null>(null);
@@ -29,17 +31,11 @@ export function useFileSystem(): UseFileSystemReturn {
     error: null,
   });
 
-  const isSupported = isFileSystemAccessSupported();
+  // Always supported: either native API or fallback
+  const isSupported = true;
+  const hasNativeApi = isFileSystemAccessSupported();
 
   const openDirectory = useCallback(async () => {
-    if (!isSupported) {
-      setScanState((prev) => ({
-        ...prev,
-        error: 'File System Access API is not supported in this browser.',
-      }));
-      return;
-    }
-
     try {
       setScanState({
         isScanning: true,
@@ -48,10 +44,22 @@ export function useFileSystem(): UseFileSystemReturn {
         error: null,
       });
 
-      const dirHandle = await selectDirectory();
-      const images = await scanDirectoryRecursively(dirHandle);
-      const tree = buildFolderTree(images, dirHandle.name);
+      let images: ImageFile[];
+      let rootName: string;
 
+      if (hasNativeApi) {
+        // Chrome/Edge: use File System Access API
+        const dirHandle = await selectDirectory();
+        rootName = dirHandle.name;
+        images = await scanDirectoryRecursively(dirHandle);
+      } else {
+        // Firefox/Safari: use <input webkitdirectory> fallback
+        const result = await selectDirectoryFallback();
+        rootName = result.name;
+        images = result.images;
+      }
+
+      const tree = buildFolderTree(images, rootName);
       setAllImages(images);
       setFolderTree(tree);
       setScanState({
@@ -74,7 +82,7 @@ export function useFileSystem(): UseFileSystemReturn {
         error: message,
       }));
     }
-  }, [isSupported]);
+  }, [hasNativeApi]);
 
   return { folderTree, allImages, scanState, openDirectory, isSupported };
 }
