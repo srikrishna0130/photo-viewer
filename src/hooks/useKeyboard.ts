@@ -5,6 +5,7 @@ interface KeyboardActions {
   onRight?: () => void;
   onEscape?: () => void;
   onEnter?: () => void;
+  onRotateRight?: () => void;
   enabled?: boolean;
 }
 
@@ -22,7 +23,7 @@ interface KeyboardActions {
  * });
  */
 export function useKeyboard(actions: KeyboardActions): void {
-  const { onLeft, onRight, onEscape, onEnter, enabled = true } = actions;
+  const { onLeft, onRight, onEscape, onEnter, onRotateRight, enabled = true } = actions;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -45,9 +46,13 @@ export function useKeyboard(actions: KeyboardActions): void {
           event.preventDefault();
           onEnter?.();
           break;
+        case 'r':
+          event.preventDefault();
+          onRotateRight?.();
+          break;
       }
     },
-    [onLeft, onRight, onEscape, onEnter, enabled]
+    [onLeft, onRight, onEscape, onEnter, onRotateRight, enabled]
   );
 
   useEffect(() => {

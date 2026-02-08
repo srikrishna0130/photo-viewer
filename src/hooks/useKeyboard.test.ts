@@ -60,4 +60,11 @@ describe('useKeyboard', () => {
     fireKey('ArrowLeft');
     expect(onLeft).not.toHaveBeenCalled();
   });
+
+  it('calls onRotateRight when R is pressed', () => {
+    const onRotateRight = vi.fn();
+    renderHook(() => useKeyboard({ onRotateRight }));
+    fireKey('r');
+    expect(onRotateRight).toHaveBeenCalledOnce();
+  });
 });

@@ -22,21 +22,29 @@ export default function PhotoViewer({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [rotation, setRotation] = useState(0);
 
   const currentImage = images[currentIndex];
 
   const goNext = useCallback(() => {
     setCurrentIndex((i) => (i < images.length - 1 ? i + 1 : i));
+    setRotation(0);
   }, [images.length]);
 
   const goPrev = useCallback(() => {
     setCurrentIndex((i) => (i > 0 ? i - 1 : i));
+    setRotation(0);
+  }, []);
+
+  const rotateRight = useCallback(() => {
+    setRotation((r) => (r + 90) % 360);
   }, []);
 
   useKeyboard({
     onLeft: goPrev,
     onRight: goNext,
     onEscape: onClose,
+    onRotateRight: rotateRight,
     enabled: true,
   });
 
@@ -124,7 +132,8 @@ export default function PhotoViewer({
           <img
             src={imageUrl}
             alt={currentImage.name}
-            className="max-w-full max-h-full object-contain select-none"
+            className="max-w-full max-h-full object-contain select-none transition-transform duration-200"
+            style={{ transform: `rotate(${rotation}deg)` }}
             draggable={false}
           />
         ) : (
@@ -150,6 +159,7 @@ export default function PhotoViewer({
       {/* Footer with keyboard hints */}
       <div className="flex justify-center gap-4 py-2 text-xs text-gray-500">
         <span>← → Navigate</span>
+        <span>R Rotate</span>
         <span>ESC Close</span>
       </div>
     </div>

@@ -3,11 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Fast, LLM-optimized photo viewer web application",
+  "description": "Fast, LLM-optimized photo viewer web application and reusable component library",
+  "main": "./dist/photo-viewer.js",
+  "types": "./src/lib/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/photo-viewer.js",
+      "types": "./src/lib/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "start": "vite --open",
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:lib": "vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
