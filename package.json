@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Fast, LLM-optimized photo viewer web application",
   "scripts": {
+    "start": "vite --open",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
