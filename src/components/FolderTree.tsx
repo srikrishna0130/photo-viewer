@@ -5,8 +5,9 @@ import FolderItem from './FolderItem';
 interface FolderTreeProps {
   tree: FolderNode;
   selectedPath: string | null;
+  expandedPaths: Set<string>;
   onSelectFolder: (node: FolderNode) => void;
-  onToggleFolder: (node: FolderNode) => void;
+  onToggleFolder: (path: string) => void;
 }
 
 /**
@@ -16,6 +17,7 @@ interface FolderTreeProps {
 export default function FolderTree({
   tree,
   selectedPath,
+  expandedPaths,
   onSelectFolder,
   onToggleFolder,
 }: FolderTreeProps): React.ReactElement {
@@ -31,6 +33,7 @@ export default function FolderTree({
           node={tree}
           depth={0}
           selectedPath={selectedPath}
+          expandedPaths={expandedPaths}
           onSelect={onSelectFolder}
           onToggle={onToggleFolder}
         />

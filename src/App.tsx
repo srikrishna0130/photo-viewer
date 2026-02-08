@@ -15,6 +15,7 @@ import type { FolderNode, ImageFile } from './types';
 function App(): React.ReactElement {
   const { folderTree, scanState, openDirectory } = useFileSystem();
   const [selectedFolder, setSelectedFolder] = useState<FolderNode | null>(null);
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [viewerState, setViewerState] = useState<{
     images: ImageFile[];
     index: number;
@@ -31,10 +32,16 @@ function App(): React.ReactElement {
     setSelectedFolder(node);
   }, []);
 
-  const handleToggleFolder = useCallback((node: FolderNode) => {
-    node.isExpanded = !node.isExpanded;
-    // Force re-render by toggling selection
-    setSelectedFolder((prev) => (prev === node ? { ...node } : prev));
+  const handleToggleFolder = useCallback((path: string) => {
+    setExpandedPaths((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
   }, []);
 
   const handleImageClick = useCallback(
@@ -116,6 +123,7 @@ function App(): React.ReactElement {
         <FolderTree
           tree={folderTree}
           selectedPath={selectedFolder?.path ?? null}
+          expandedPaths={expandedPaths}
           onSelectFolder={handleSelectFolder}
           onToggleFolder={handleToggleFolder}
         />

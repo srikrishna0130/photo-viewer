@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import type { FolderNode } from '../types';
 import { countImagesInSubtree } from '../utils/treeBuilder';
 
@@ -6,24 +6,34 @@ interface FolderItemProps {
   node: FolderNode;
   depth: number;
   selectedPath: string | null;
+  expandedPaths: Set<string>;
   onSelect: (node: FolderNode) => void;
-  onToggle: (node: FolderNode) => void;
+  onToggle: (path: string) => void;
 }
 
 /**
- * FolderItem - Renders a single folder node in the tree
- * Displays folder name, image count, and expand/collapse toggle
+ * FolderItem - Renders a single folder node in the tree.
+ * Clicking the row selects the folder AND toggles expand/collapse.
  */
-const FolderItem = memo(function FolderItem({
+export default function FolderItem({
   node,
   depth,
   selectedPath,
+  expandedPaths,
   onSelect,
   onToggle,
 }: FolderItemProps): React.ReactElement {
   const imageCount = countImagesInSubtree(node);
   const isSelected = selectedPath === node.path;
   const hasChildren = node.children.length > 0;
+  const isExpanded = expandedPaths.has(node.path) || node.isExpanded;
+
+  const handleClick = (): void => {
+    onSelect(node);
+    if (hasChildren) {
+      onToggle(node.path);
+    }
+  };
 
   return (
     <div>
@@ -32,18 +42,12 @@ const FolderItem = memo(function FolderItem({
           isSelected ? 'bg-blue-100 text-blue-800 font-medium' : 'text-gray-700'
         }`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
-        onClick={() => onSelect(node)}
+        onClick={handleClick}
         title={node.path}
       >
         {hasChildren ? (
-          <span
-            className="mr-1 cursor-pointer select-none w-4 text-center text-gray-400"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle(node);
-            }}
-          >
-            {node.isExpanded ? '▼' : '▶'}
+          <span className="mr-1 select-none w-4 text-center text-gray-400">
+            {isExpanded ? '▼' : '▶'}
           </span>
         ) : (
           <span className="mr-1 w-4" />
@@ -55,19 +59,18 @@ const FolderItem = memo(function FolderItem({
         )}
       </button>
 
-      {node.isExpanded &&
+      {isExpanded &&
         node.children.map((child) => (
           <FolderItem
             key={child.id}
             node={child}
             depth={depth + 1}
             selectedPath={selectedPath}
+            expandedPaths={expandedPaths}
             onSelect={onSelect}
             onToggle={onToggle}
           />
         ))}
     </div>
   );
-});
-
-export default FolderItem;
+}
